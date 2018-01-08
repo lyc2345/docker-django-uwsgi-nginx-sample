@@ -1,0 +1,38 @@
+version: '3' 
+services:
+  web:
+    container_name: wb01
+    build: ./web
+    #expose:
+    # - 8000
+    command: uwsgi --ini uwsgi.ini
+    ports:
+      - 8002:8000
+    volumes:
+      - web_data:/api
+    depends_on:
+      - db
+    
+  db:
+    container_name: pg01
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+
+  nginx:
+    container_name: ng01
+    build: ./nginx
+    ports:
+      - 8080:80
+    volumes:
+      - web_data:/api
+      - ./log:/var/log/nginx
+    depends_on:
+      - web
+
+volumes:
+  web_data:
+  pg_data:
+
